@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <!-- Splash screen theme -->
+    <style
+        name="Theme.CalculatorApp"
+        parent="Theme.SplashScreen">
+
+        <!-- Splash screen background -->
+        <item name="windowSplashScreenBackground">#121212</item>
+
+        <!-- Cat calculator splash icon -->
+        <item name="windowSplashScreenAnimatedIcon">
+            @mipmap/ic_launcher_foreground
+        </item>
+
+        <!-- Theme used after splash screen -->
+        <item name="postSplashScreenTheme">
+            @style/Theme.CalculatorApp_Main
+        </item>
+
+    </style>
+
+
+    <!-- Main application theme -->
+    <style
+        name="Theme.CalculatorApp_Main"
+        parent="Theme.Material3.DayNight.NoActionBar">
+
+        <item name="android:fontFamily">sans</item>
+
+        <!-- Dark status bar -->
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">#121212</item>
+
+    </style>
+
+</resources>
