@@ -1,49 +1,61 @@
 package com.example.calculatorapp;
 
+/*
+ Logan LeVon
+ ID : 42413849
+ Honor Code: I pledge that I have neither given nor received help from anyone
+ other than the instructor or the TAs for all program components included here.
+ */
+
+
+
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
+/**
+ * Main activity for the calculator.
+ * Handles the calculator buttons and displays the user's expression and result.
+ */
 public class CalcMain extends AppCompatActivity {
 
-    TextView calculatorDisplay;
-    Normal_Calc normalCalc;
+    private TextView calculatorDisplay;
+    private Normal_Calc normalCalc;
 
-    double firstNumber = 0;
+    /**
+     * Stores the current calculator expression.
+     */
+    private String expression = "";
 
-    String operator = "";
+    /**
+     * Tracks whether the calculator just displayed a result.
+     */
+    private boolean justCalculated = false;
 
-    boolean newNumber = true;
-
-
+    /**
+     * Creates the calculator screen and sets up all button listeners.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // Start the splash screen
         SplashScreen.installSplashScreen(this);
 
         super.onCreate(savedInstanceState);
 
+        EdgeToEdge.enable(this);
+
         setContentView(R.layout.calclayout);
 
+        calculatorDisplay = findViewById(R.id.calculatorDisplay);
 
-        // Create calculator object
         normalCalc = new Normal_Calc();
-
-
-        // Connect display to Java
-        calculatorDisplay =
-                findViewById(R.id.calculatorDisplay);
-
-
-        // ========================================================
-        // NUMBER BUTTONS
-        // ========================================================
 
         Button button0 = findViewById(R.id.button0);
         Button button1 = findViewById(R.id.button1);
@@ -56,81 +68,42 @@ public class CalcMain extends AppCompatActivity {
         Button button8 = findViewById(R.id.button8);
         Button button9 = findViewById(R.id.button9);
 
+        Button buttonDecimal = findViewById(R.id.buttonDecimal);
 
-        // ========================================================
-        // OPERATOR BUTTONS
-        // ========================================================
+        Button buttonAdd = findViewById(R.id.buttonAdd);
+        Button buttonSubtract = findViewById(R.id.buttonSubtract);
+        Button buttonMultiply = findViewById(R.id.buttonMultiply);
+        Button buttonDivide = findViewById(R.id.buttonDivide);
 
-        Button buttonAdd =
-                findViewById(R.id.buttonAdd);
+        Button buttonOpenParen = findViewById(R.id.buttonOpenParen);
+        Button buttonCloseParen = findViewById(R.id.buttonCloseParen);
 
-        Button buttonSubtract =
-                findViewById(R.id.buttonSubtract);
+        Button buttonAC = findViewById(R.id.buttonAC);
+        Button buttonClear = findViewById(R.id.buttonClear);
+        Button buttonEquals = findViewById(R.id.buttonEquals);
+        Button buttonBases = findViewById(R.id.buttonBases);
 
-        Button buttonMultiply =
-                findViewById(R.id.buttonMultiply);
+        View.OnClickListener numberListener = view -> {
 
-        Button buttonDivide =
-                findViewById(R.id.buttonDivide);
+            Button button = (Button) view;
 
+            String number = button.getText().toString();
 
-        // ========================================================
-        // OTHER BUTTONS
-        // ========================================================
+            if (calculatorDisplay.getText().toString().equals("LeVon 42413849")
+                    || calculatorDisplay.getText().toString().equals("Error")
+                    || justCalculated) {
 
-        Button buttonDecimal =
-                findViewById(R.id.buttonDecimal);
+                expression = number;
 
-        Button buttonEquals =
-                findViewById(R.id.buttonEquals);
+                justCalculated = false;
 
-        Button buttonClear =
-                findViewById(R.id.buttonClear);
+            } else {
 
-        Button buttonBases =
-                findViewById(R.id.buttonBases);
+                expression += number;
+            }
 
-
-        // ========================================================
-        // NUMBER BUTTON LISTENER
-        // ========================================================
-
-        View.OnClickListener numberListener =
-                new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-
-                        Button button =
-                                (Button) v;
-
-                        String number =
-                                button.getText().toString();
-
-
-                        // Start a new number
-                        if (newNumber) {
-
-                            if (operator.isEmpty()) {
-
-                                calculatorDisplay.setText(number);
-
-                            } else {
-
-                                calculatorDisplay.append(number);
-                            }
-
-                            newNumber = false;
-
-                        } else {
-
-                            calculatorDisplay.append(number);
-                        }
-                    }
-                };
-
-
-        // Connect number buttons to listener
+            calculatorDisplay.setText(expression);
+        };
 
         button0.setOnClickListener(numberListener);
         button1.setOnClickListener(numberListener);
@@ -143,308 +116,226 @@ public class CalcMain extends AppCompatActivity {
         button8.setOnClickListener(numberListener);
         button9.setOnClickListener(numberListener);
 
+        buttonDecimal.setOnClickListener(view -> addDecimal());
 
-        // ========================================================
-        // DECIMAL BUTTON
-        // ========================================================
+        buttonAdd.setOnClickListener(view -> addOperator("+"));
+        buttonSubtract.setOnClickListener(view -> addOperator("-"));
+        buttonMultiply.setOnClickListener(view -> addOperator("*"));
+        buttonDivide.setOnClickListener(view -> addOperator("/"));
 
-        buttonDecimal.setOnClickListener(
-                v -> addDecimal()
-        );
+        buttonOpenParen.setOnClickListener(view -> addOpenParenthesis());
+        buttonCloseParen.setOnClickListener(view -> addCloseParenthesis());
 
+        buttonEquals.setOnClickListener(view -> calculateResult());
 
-        // ========================================================
-        // OPERATOR BUTTONS
-        // ========================================================
+        buttonClear.setOnClickListener(view -> clearLastEntry());
 
-        buttonAdd.setOnClickListener(
-                v -> setOperator("+")
-        );
+        buttonAC.setOnClickListener(view -> allClear());
 
-        buttonSubtract.setOnClickListener(
-                v -> setOperator("-")
-        );
+        buttonBases.setOnClickListener(view -> {
 
-        buttonMultiply.setOnClickListener(
-                v -> setOperator("*")
-        );
-
-        buttonDivide.setOnClickListener(
-                v -> setOperator("/")
-        );
-
-
-        // ========================================================
-        // EQUALS
-        // ========================================================
-
-        buttonEquals.setOnClickListener(
-                v -> calculateResult()
-        );
-
-
-        // ========================================================
-        // CLEAR
-        // ========================================================
-
-        buttonClear.setOnClickListener(
-                v -> clearCalculator()
-        );
-
-
-        // ========================================================
-        // BASE CONVERTER
-        // ========================================================
-
-        buttonBases.setOnClickListener(v -> {
-
-            Intent intent =
-                    new Intent(
-                            CalcMain.this,
-                            BasesMain.class
-                    );
+            Intent intent = new Intent(CalcMain.this, BasesMain.class);
 
             startActivity(intent);
         });
     }
 
-
-    // ============================================================
-    // ADD DECIMAL
-    // ============================================================
-
+    /**
+     * Adds a decimal point to the current number.
+     */
     private void addDecimal() {
 
-        String display =
-                calculatorDisplay.getText().toString();
+        if (calculatorDisplay.getText().toString().equals("Logan LeVon 42413849")
+                || justCalculated) {
 
+            expression = "0.";
 
-        // If starting a new number,
-        // start it with 0.
-        if (newNumber) {
+            justCalculated = false;
 
-            if (operator.isEmpty()) {
-
-                calculatorDisplay.setText("0.");
-
-            } else {
-
-                calculatorDisplay.append("0.");
-            }
-
-            newNumber = false;
+            calculatorDisplay.setText(expression);
 
             return;
         }
 
+        int index = expression.length() - 1;
 
-        // Get the current number being entered.
-        String currentNumber;
+        while (index >= 0) {
 
+            char character = expression.charAt(index);
 
-        if (operator.isEmpty()) {
+            if (character == '+' || character == '-'
+                    || character == '*' || character == '/'
+                    || character == '(' || character == ')') {
 
-            currentNumber = display;
+                break;
+            }
+
+            if (character == '.') {
+
+                return;
+            }
+
+            index--;
+        }
+
+        expression += ".";
+
+        calculatorDisplay.setText(expression);
+    }
+
+    /**
+     * Adds an arithmetic operator to the expression.
+     *
+     * @param operator operator to add
+     */
+    private void addOperator(String operator) {
+
+        if (calculatorDisplay.getText().toString().equals("Logan LeVon 42413849")) {
+            return;
+        }
+
+        if (justCalculated) {
+
+            expression = calculatorDisplay.getText().toString();
+
+            justCalculated = false;
+        }
+
+        if (expression.length() == 0) {
+            return;
+        }
+
+        char lastCharacter = expression.charAt(expression.length() - 1);
+
+        if (lastCharacter == '+'
+                || lastCharacter == '-'
+                || lastCharacter == '*'
+                || lastCharacter == '/') {
+
+            expression = expression.substring(0, expression.length() - 1);
+        }
+
+        expression += operator;
+
+        calculatorDisplay.setText(expression);
+    }
+
+    /**
+     * Adds an opening parenthesis to the expression.
+     */
+    private void addOpenParenthesis() {
+
+        if (calculatorDisplay.getText().toString().equals("Logan LeVon 42413849")
+                || justCalculated) {
+
+            expression = "(";
+
+            justCalculated = false;
 
         } else {
 
-            String[] parts =
-                    display.split(" ");
-
-            currentNumber =
-                    parts[parts.length - 1];
+            expression += "(";
         }
 
-
-        // Prevent multiple decimal points.
-        if (currentNumber.contains(".")) {
-            return;
-        }
-
-
-        calculatorDisplay.append(".");
+        calculatorDisplay.setText(expression);
     }
 
+    /**
+     * Adds a closing parenthesis to the expression.
+     */
+    private void addCloseParenthesis() {
 
-    // ============================================================
-    // SET OPERATOR
-    // ============================================================
-
-    private void setOperator(String selectedOperator) {
-
-        String display =
-                calculatorDisplay.getText().toString();
-
-
-        // Prevent an operator from being
-        // entered before a number.
-        if (display.equals("0") && operator.isEmpty()) {
+        if (expression.length() == 0) {
             return;
         }
 
+        int openParentheses = 0;
+        int closeParentheses = 0;
 
-        // If an operation is already active,
-        // don't add another operator.
-        if (!operator.isEmpty()) {
+        for (int i = 0; i < expression.length(); i++) {
+
+            if (expression.charAt(i) == '(') {
+                openParentheses++;
+            }
+
+            if (expression.charAt(i) == ')') {
+                closeParentheses++;
+            }
+        }
+
+        if (openParentheses <= closeParentheses) {
             return;
         }
 
+        char lastCharacter = expression.charAt(expression.length() - 1);
 
-        try {
-
-            firstNumber =
-                    Double.parseDouble(display);
-
-        } catch (NumberFormatException e) {
-
-            calculatorDisplay.setText("Error");
-
-            firstNumber = 0;
-            operator = "";
-            newNumber = true;
+        if (lastCharacter == '+'
+                || lastCharacter == '-'
+                || lastCharacter == '*'
+                || lastCharacter == '/'
+                || lastCharacter == '(') {
 
             return;
         }
 
+        expression += ")";
 
-        operator = selectedOperator;
-
-
-        // Show the operation on screen.
-        calculatorDisplay.append(
-                " " + selectedOperator + " "
-        );
-
-
-        // The next number starts fresh.
-        newNumber = true;
+        calculatorDisplay.setText(expression);
     }
 
-
-    // ============================================================
-    // CALCULATE RESULT
-    // ============================================================
-
+    /**
+     * Calculates the complete mathematical expression.
+     */
     private void calculateResult() {
 
-        // There is no operation to calculate.
-        if (operator.isEmpty()) {
+        if (expression.length() == 0) {
             return;
         }
-
-
-        String display =
-                calculatorDisplay.getText().toString();
-
-
-        String[] parts =
-                display.split(" ");
-
-
-        // We need:
-        // parts[0] = first number
-        // parts[1] = operator
-        // parts[2] = second number
-
-        if (parts.length < 3) {
-            return;
-        }
-
-
-        double secondNumber;
-
 
         try {
 
-            secondNumber =
-                    Double.parseDouble(parts[2]);
+            double result = normalCalc.calculateExpression(expression);
 
-        } catch (NumberFormatException e) {
+            expression = normalCalc.formatResult(result);
+
+            calculatorDisplay.setText(expression);
+
+            justCalculated = true;
+
+        } catch (Exception e) {
 
             calculatorDisplay.setText("Error");
 
-            firstNumber = 0;
-            operator = "";
-            newNumber = true;
+            expression = "";
 
+            justCalculated = false;
+        }
+    }
+
+    /**
+     * Clears the most recent entry from the calculator display.
+     */
+    private void clearLastEntry() {
+
+        if (expression.length() == 0) {
             return;
         }
 
+        expression = expression.substring(0, expression.length() - 1);
 
-        try {
-
-            double result =
-                    normalCalc.calculate(
-                            firstNumber,
-                            secondNumber,
-                            operator
-                    );
-
-
-            // Display the result.
-            calculatorDisplay.setText(
-                    formatResult(result)
-            );
-
-
-            // Store result for possible
-            // continued calculations.
-            firstNumber = result;
-
-
-            // Reset operator.
-            operator = "";
-
-
-            // Next number starts fresh.
-            newNumber = true;
-
-
-        } catch (ArithmeticException e) {
-
-            // Division by zero.
-            calculatorDisplay.setText("Error");
-
-            firstNumber = 0;
-            operator = "";
-            newNumber = true;
-        }
+        calculatorDisplay.setText(expression);
     }
 
+    /**
+     * Clears the entire calculator and returns the display
+     * to the developer identification text.
+     */
+    private void allClear() {
 
-    // ============================================================
-    // CLEAR CALCULATOR
-    // ============================================================
+        expression = "";
 
-    private void clearCalculator() {
+        justCalculated = false;
 
-        calculatorDisplay.setText("0");
-
-        firstNumber = 0;
-
-        operator = "";
-
-        newNumber = true;
-    }
-
-
-    // ============================================================
-    // FORMAT RESULT
-    // ============================================================
-
-    private String formatResult(double result) {
-
-        // If the result is a whole number,
-        // don't display unnecessary .0
-
-        if (result == (long) result) {
-
-            return String.valueOf(
-                    (long) result
-            );
-        }
-
-
-        return String.valueOf(result);
+        calculatorDisplay.setText("Logan LeVon 42413849");
     }
 }

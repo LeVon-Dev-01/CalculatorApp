@@ -1,9 +1,6 @@
 package com.example.calculatorapp;
 
-import android.graphics.Color;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,34 +9,22 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * Activity used for converting numbers between
+ * binary, decimal, hexadecimal, and octal.
+ */
 public class BasesMain extends AppCompatActivity {
 
-    EditText baseInput;
-    Spinner conversionSpinner;
-    Button convertButton;
-    Button backButton;
-    TextView baseResult;
+    private EditText baseInput;
+    private Spinner conversionSpinner;
+    private TextView baseResult;
 
-    Calculation_Bases baseCalculator;
+    private Calculation_Bases calculationBases;
 
-    String[] conversions = {
-            "Decimal → Binary",
-            "Decimal → Octal",
-            "Decimal → Hexadecimal",
-
-            "Binary → Decimal",
-            "Binary → Octal",
-            "Binary → Hexadecimal",
-
-            "Octal → Decimal",
-            "Octal → Binary",
-            "Octal → Hexadecimal",
-
-            "Hexadecimal → Decimal",
-            "Hexadecimal → Binary",
-            "Hexadecimal → Octal"
-    };
-
+    /**
+     * Creates the base converter screen and sets up
+     * the conversion controls.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -47,92 +32,125 @@ public class BasesMain extends AppCompatActivity {
 
         setContentView(R.layout.baseslayout);
 
-        baseCalculator = new Calculation_Bases();
-
         baseInput = findViewById(R.id.baseInput);
+
         conversionSpinner = findViewById(R.id.conversionSpinner);
-        convertButton = findViewById(R.id.convertButton);
+
         baseResult = findViewById(R.id.baseResult);
-        backButton = findViewById(R.id.backButton);
 
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<String>(
-                        this,
-                        android.R.layout.simple_spinner_item,
-                        conversions
-                ) {
+        Button convertButton = findViewById(R.id.convertButton);
 
-                    @Override
-                    public View getView(
-                            int position,
-                            View convertView,
-                            ViewGroup parent) {
+        Button backButton = findViewById(R.id.backButton);
 
-                        TextView textView =
-                                (TextView) super.getView(
-                                        position,
-                                        convertView,
-                                        parent
-                                );
+        calculationBases = new Calculation_Bases();
 
-                        textView.setTextColor(Color.WHITE);
-                        textView.setTextSize(18);
-                        textView.setPadding(
-                                16,
-                                0,
-                                16,
-                                0
-                        );
+        String[] conversions = {
+                "Decimal to Binary",
+                "Decimal to Hexadecimal",
+                "Decimal to Octal",
+                "Binary to Decimal",
+                "Binary to Hexadecimal",
+                "Binary to Octal",
+                "Hexadecimal to Decimal",
+                "Hexadecimal to Binary",
+                "Hexadecimal to Octal",
+                "Octal to Decimal",
+                "Octal to Binary",
+                "Octal to Hexadecimal"
+        };
 
-                        return textView;
-                    }
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_spinner_item,
+                conversions
+        ) {
 
-                    @Override
-                    public View getDropDownView(
-                            int position,
-                            View convertView,
-                            ViewGroup parent) {
+            /**
+             * Sets the text size and color of the selected
+             * spinner item.
+             *
+             * @param position selected position
+             * @param convertView spinner view
+             * @param parent spinner parent
+             * @return configured spinner view
+             */
+            @Override
+            public android.view.View getView(
+                    int position,
+                    android.view.View convertView,
+                    android.view.ViewGroup parent) {
 
-                        TextView textView =
-                                (TextView) super.getDropDownView(
-                                        position,
-                                        convertView,
-                                        parent
-                                );
+                TextView textView = (TextView) super.getView(
+                        position,
+                        convertView,
+                        parent
+                );
 
-                        textView.setTextColor(Color.WHITE);
-                        textView.setTextSize(18);
+                textView.setTextSize(26);
 
-                        textView.setBackgroundColor(
-                                Color.rgb(30, 30, 30)
-                        );
+                textView.setTextColor(
+                        android.graphics.Color.WHITE
+                );
 
-                        textView.setPadding(
-                                16,
-                                20,
-                                16,
-                                20
-                        );
+                textView.setPadding(16, 20, 16, 20);
 
-                        return textView;
-                    }
-                };
+                return textView;
+            }
+
+            /**
+             * Sets the text size and color of the dropdown
+             * spinner items.
+             *
+             * @param position item position
+             * @param convertView dropdown view
+             * @param parent dropdown parent
+             * @return configured dropdown view
+             */
+            @Override
+            public android.view.View getDropDownView(
+                    int position,
+                    android.view.View convertView,
+                    android.view.ViewGroup parent) {
+
+                TextView textView = (TextView) super.getDropDownView(
+                        position,
+                        convertView,
+                        parent
+                );
+
+                textView.setTextSize(26);
+
+                textView.setTextColor(
+                        android.graphics.Color.WHITE
+                );
+
+                textView.setBackgroundColor(
+                        android.graphics.Color.rgb(30, 30, 30)
+                );
+
+                textView.setPadding(16, 24, 16, 24);
+
+                return textView;
+            }
+        };
+
+        adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item
+        );
 
         conversionSpinner.setAdapter(adapter);
 
-        convertButton.setOnClickListener(
-                v -> convertNumber()
-        );
+        convertButton.setOnClickListener(view -> convertNumber());
 
-        backButton.setOnClickListener(
-                v -> finish()
-        );
+        backButton.setOnClickListener(view -> finish());
     }
 
+    /**
+     * Converts the input number using the selected conversion.
+     */
     private void convertNumber() {
 
-        String input =
-                baseInput.getText().toString().trim();
+        String input = baseInput.getText().toString().trim();
 
         if (input.isEmpty()) {
 
@@ -141,141 +159,85 @@ public class BasesMain extends AppCompatActivity {
             return;
         }
 
-        String conversion =
-                conversionSpinner
-                        .getSelectedItem()
-                        .toString();
-
         try {
+
+            String conversion =
+                    conversionSpinner.getSelectedItem().toString();
 
             String result;
 
             switch (conversion) {
 
-                case "Decimal → Binary":
-
-                    result =
-                            baseCalculator.decimalToBinary(
-                                    Integer.parseInt(input)
-                            );
-
+                case "Decimal to Binary":
+                    result = calculationBases.decimalToBinary(
+                            Integer.parseInt(input)
+                    );
                     break;
 
-                case "Decimal → Octal":
-
-                    result =
-                            baseCalculator.decimalToOctal(
-                                    Integer.parseInt(input)
-                            );
-
+                case "Decimal to Hexadecimal":
+                    result = calculationBases.decimalToHex(
+                            Integer.parseInt(input)
+                    );
                     break;
 
-                case "Decimal → Hexadecimal":
-
-                    result =
-                            baseCalculator.decimalToHex(
-                                    Integer.parseInt(input)
-                            );
-
+                case "Decimal to Octal":
+                    result = calculationBases.decimalToOctal(
+                            Integer.parseInt(input)
+                    );
                     break;
 
-                case "Binary → Decimal":
-
-                    result =
-                            String.valueOf(
-                                    baseCalculator.binaryToDecimal(
-                                            input
-                                    )
-                            );
-
+                case "Binary to Decimal":
+                    result = String.valueOf(
+                            calculationBases.binaryToDecimal(input)
+                    );
                     break;
 
-                case "Binary → Octal":
-
-                    result =
-                            baseCalculator.binaryToOctal(
-                                    input
-                            );
-
+                case "Binary to Hexadecimal":
+                    result = calculationBases.binaryToHex(input);
                     break;
 
-                case "Binary → Hexadecimal":
-
-                    result =
-                            baseCalculator.binaryToHex(
-                                    input
-                            );
-
+                case "Binary to Octal":
+                    result = calculationBases.binaryToOctal(input);
                     break;
 
-                case "Octal → Decimal":
-
-                    result =
-                            String.valueOf(
-                                    baseCalculator.octalToDecimal(
-                                            input
-                                    )
-                            );
-
+                case "Hexadecimal to Decimal":
+                    result = String.valueOf(
+                            calculationBases.hexToDecimal(input)
+                    );
                     break;
 
-                case "Octal → Binary":
-
-                    result =
-                            baseCalculator.octalToBinary(
-                                    input
-                            );
-
+                case "Hexadecimal to Binary":
+                    result = calculationBases.hexToBinary(input);
                     break;
 
-                case "Octal → Hexadecimal":
-
-                    result =
-                            baseCalculator.octalToHex(
-                                    input
-                            );
-
+                case "Hexadecimal to Octal":
+                    result = calculationBases.hexToOctal(input);
                     break;
 
-                case "Hexadecimal → Decimal":
-
-                    result =
-                            String.valueOf(
-                                    baseCalculator.hexToDecimal(
-                                            input
-                                    )
-                            );
-
+                case "Octal to Decimal":
+                    result = String.valueOf(
+                            calculationBases.octalToDecimal(input)
+                    );
                     break;
 
-                case "Hexadecimal → Binary":
-
-                    result =
-                            baseCalculator.hexToBinary(
-                                    input
-                            );
-
+                case "Octal to Binary":
+                    result = calculationBases.octalToBinary(input);
                     break;
 
-                case "Hexadecimal → Octal":
-
-                    result =
-                            baseCalculator.hexToOctal(
-                                    input
-                            );
-
+                case "Octal to Hexadecimal":
+                    result = calculationBases.octalToHex(input);
                     break;
 
                 default:
-
                     result = "Invalid conversion";
+                    break;
             }
 
             baseResult.setText(result);
 
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
 
-            baseResult.setText("Invalid number");
+            baseResult.setText("Invalid input");
         }
     }
 }
